@@ -11,15 +11,15 @@ public class SimpleLinkedList<T> {
      * Head: Nodo que representa la cabeza de la lista.
      * Size: Tamaño de la lista.
      */
-    private Node<T> head;
-    private int size;
+    protected Node<T> head;
+    protected int size;
 
     /**
      * Clase que representa un nodo de la lista.
      *
      * @param <E> Tipo de dato que almacenará el nodo.
      */
-    public static class Node<E> {
+    protected static class Node<E> {
         /**
          * Atributos de la clase.
          * Value: Valor que almacenará el nodo.
@@ -400,4 +400,29 @@ public class SimpleLinkedList<T> {
 
         return true;
     }
+
+    /**
+     * Método que permite obtener el primer nodo que coincida con el elemento recibido.
+     * @param value Valor que se desea obtener.
+     * @return Primera aparición de value.
+     * @throws NullPointerException Si el valor que se desea obtener no existe en la lista.
+     */
+    public T getFirst(T value) throws NullPointerException {
+        return handleGetFirst(head, value);
+    }
+
+    /**
+     * Método de ayuda que permite obtener el primer nodo que coincida con el elemento recibido.
+     * @param node Nodo actual.
+     * @param value Valor que se desea obtener.
+     * @return Primera aparición de value.
+     */
+    private T handleGetFirst(Node<T> node, T value){
+        if (!node.getValue().equals(value)){
+            return handleGetFirst(node.getNext(), value);
+        }
+
+        return node.getValue();
+    }
+
 }

@@ -37,13 +37,13 @@ procesa).
 
 ## El menú
 INFORMACIÓN BANCARIA
-1. Número de clientes
-2. Total de capital depositado
-3. Total intereses a pagar
-4. Adicionar nuevo usuario
-5. Dar de baja a usuarios
-6. Actualizar usuarios
-7. Buscar usuarios (por ID)
+1. Número de clientes ✅
+2. Total de capital depositado ✅
+3. Total intereses a pagar ✅
+4. Adicionar nuevo usuario ✅
+5. Dar de baja a usuarios ✅
+6. Actualizar usuarios ✅
+7. Buscar usuarios (por ID) ✅
 8. Listar los usuarios
 9. Salvar Lista a Archivo
 10. Salir
