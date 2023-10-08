@@ -45,10 +45,11 @@ INFORMACIÓN BANCARIA
 6. Actualizar usuarios ✅
 7. Buscar usuarios (por ID) ✅
 8. Listar los usuarios ✅
-9. Salvar Lista a Archivo
-10. Salir
+9. Guardar lista en un archivo ✅
+10. Cargar lista desde un archivo ✅
+11. Salir ✅
 
-Seleccione una opción (1 - 10):
+Seleccione una opción (1 - 11):
 
 ##  Salida
 La salida debe imprimir los datos correspondientes en consola. ✅
