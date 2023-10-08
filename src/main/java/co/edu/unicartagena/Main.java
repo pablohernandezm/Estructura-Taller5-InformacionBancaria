@@ -3,14 +3,34 @@ package co.edu.unicartagena;
 import co.edu.unicartagena.Clases.BankInfo;
 import co.edu.unicartagena.Clases.Record;
 
+import java.math.BigDecimal;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * Sistema de administración bancaria con interfaz de clientes basado en listas simples enlazadas
+ *
+ * @author Pablo José Hernández Meléndez
+ * @see co.edu.unicartagena.Estructuras.SimpleLinkedList
+ * @see co.edu.unicartagena.Clases.BankInfo
+ * @see co.edu.unicartagena.Clases.Record
+ */
 public class Main {
+    /**
+     * Scanner para leer datos de la consola.
+     */
     private static final Scanner sc = new Scanner(System.in);
+    /**
+     * Lista enlazada simple para almacenar información de los registros del banco.
+     */
     private static final BankInfo bi = new BankInfo();
 
+    /**
+     * Método principal del programa.
+     *
+     * @param args Argumentos de la línea de comandos.
+     */
     public static void main(String[] args) {
         menu:
         do {
@@ -35,8 +55,10 @@ public class Main {
 
             switch (option) {
                 case 1 -> execute(() -> System.out.println("Número de clientes: " + bi.getSize()), false);
-                case 2 -> execute(() -> System.out.println("Total capital depositado: " + bi.getTotalCapital()), false);
-                case 3 -> execute(() -> System.out.println("Total intereses a pagar: " + bi.getTotalInterest()), false);
+                case 2 ->
+                        execute(() -> System.out.println("Total capital depositado: " + String.format("$%.2f", bi.getTotalCapital())), false);
+                case 3 ->
+                        execute(() -> System.out.println("Total intereses a pagar: " + String.format("$%.2f", bi.getTotalInterest())), false);
                 case 4 -> execute(Main::addUser, false);
                 case 5 -> execute(Main::removeUser, true);
                 case 6 -> execute(Main::updateUser, true);
@@ -52,7 +74,7 @@ public class Main {
     }
 
     /**
-     * Ejecuta una acción y espera a que el usuario presione enter para continuar.
+     * Método para encapsular de operaciones.
      *
      * @param action Acción a ejecutar.
      */
@@ -71,6 +93,12 @@ public class Main {
         sc.nextLine();
     }
 
+    /**
+     * Maneja los errores de entrada.
+     *
+     * @param e Excepción lanzada.
+     * @return Si se desea volver a intentar.
+     */
     private static boolean handleInputError(Exception e) {
         System.out.println(e.getMessage());
         System.out.print("¿Desea volver a intentarlo? (s/n): ");
@@ -79,6 +107,12 @@ public class Main {
         return option.equalsIgnoreCase("s");
     }
 
+    /**
+     * Envuelve la entrada de datos en un ciclo para manejar los errores.
+     *
+     * @param action Acción a ejecutar.
+     * @return Si la entrada fue válida.
+     */
     private static boolean inputWrapper(Runnable action) {
         cleanConsole();
         while (true) {
@@ -96,9 +130,12 @@ public class Main {
         return true;
     }
 
+    /**
+     * Añade un registro a la lista.
+     */
     private static void addUser() {
-        AtomicReference<Double> capital = new AtomicReference<>(0d);
-        AtomicReference<Float> interest = new AtomicReference<>(0f);
+        AtomicReference<BigDecimal> capital = new AtomicReference<>(BigDecimal.ZERO);
+        AtomicReference<BigDecimal> interest = new AtomicReference<>(BigDecimal.ZERO);
         AtomicReference<Short> day = new AtomicReference<>((short) 0);
         AtomicReference<String> cc = new AtomicReference<>("");
 
@@ -120,22 +157,26 @@ public class Main {
                 },
                 () -> {
                     System.out.println(stateOfMenu.get());
-                    System.out.print("Ingrese el capital: ");
-                    var x = Double.parseDouble(sc.nextLine().replace(",", ".").trim());
+                    System.out.print("Ingrese el capital depositado: ");
+                    var x = new BigDecimal(sc.nextLine().replace(",", ".").trim());
+
                     Record.checkCapital(x);
                     capital.set(x);
 
                     stateOfMenu.set(stateOfMenu.get() +
-                            "\nCapital: %.2f".formatted(capital.get()));
+                            "\nCapital: $%.2f".formatted(capital.get()));
                 },
                 () -> {
                     System.out.println(stateOfMenu.get());
-                    System.out.print("Ingrese el interés: ");
-                    var x = Float.parseFloat(sc.nextLine().replace(",", ".").trim());
+                    System.out.print("""
+                            La tasa de interés se debe colocar en términos de decimales (0.1, 0.2, etc... estos son equivalentes a 10%, 20%, y así sucesivamente),
+                            Ingrese la tasa de interés:""");
+                    var x = new BigDecimal(sc.nextLine().replace(",", ".").trim());
+
                     Record.checkInterest(x);
                     interest.set(x);
                     stateOfMenu.set(stateOfMenu.get() +
-                            "\nInterés: %.4f".formatted(interest.get()));
+                            "\nTasa de interés: %.4f".formatted(interest.get()));
                 },
                 () -> {
                     System.out.println(stateOfMenu.get());
@@ -157,6 +198,9 @@ public class Main {
         System.out.println("\nEl usuario ha sido añadido a los registros.");
     }
 
+    /**
+     * Remueve un registro de la lista.
+     */
     private static void removeUser() {
         AtomicReference<String> cc = new AtomicReference<>("");
         var valid = inputWrapper(() -> {
@@ -172,6 +216,7 @@ public class Main {
 
         try {
             bi.removeRecord(cc.get());
+            System.out.println("\nEl usuario ha sido eliminado con éxito.");
         } catch (NullPointerException e) {
             if (handleInputError(e)) {
                 cleanConsole();
@@ -182,10 +227,13 @@ public class Main {
 
     }
 
+    /**
+     * Actualiza un registro de la lista.
+     */
     private static void updateUser() {
         AtomicReference<String> cc = new AtomicReference<>("");
-        AtomicReference<Double> capital = new AtomicReference<>(0d);
-        AtomicReference<Float> interest = new AtomicReference<>(0f);
+        AtomicReference<BigDecimal> capital = new AtomicReference<>(BigDecimal.ZERO);
+        AtomicReference<BigDecimal> interest = new AtomicReference<>(BigDecimal.ZERO);
         AtomicReference<Short> day = new AtomicReference<>((short) 0);
 
         AtomicReference<Record> record = new AtomicReference<>(null);
@@ -250,7 +298,7 @@ public class Main {
                     capital.set(record.get().getCapital());
                 }
                 if (!option.contains("2")) {
-                    interest.set(record.get().getInterest());
+                    interest.set(record.get().getInterestTax());
                 }
                 if (!option.contains("3")) {
                     day.set(record.get().getDay());
@@ -260,7 +308,8 @@ public class Main {
             if (all || option.contains("1")) {
                 tasks[i] = () -> {
                     System.out.print("Ingrese el nuevo capital: ");
-                    var x = Double.parseDouble(sc.nextLine().replace(",", ".").trim());
+                    var x = new BigDecimal(sc.nextLine().replace(",", ".").trim());
+
                     Record.checkCapital(x);
                     capital.set(x);
                 };
@@ -269,8 +318,9 @@ public class Main {
 
             if (all || option.contains("2")) {
                 tasks[i] = () -> {
-                    System.out.print("Ingrese el nuevo interés: ");
-                    var x = Float.parseFloat(sc.nextLine().replace(",", ".").trim());
+                    System.out.print("Ingrese la nueva tasa de interés: ");
+                    var x = new BigDecimal(sc.nextLine().replace(",", ".").trim());
+
                     Record.checkInterest(x);
                     interest.set(x);
                 };
@@ -281,6 +331,7 @@ public class Main {
                 tasks[i] = () -> {
                     System.out.print("Ingrese el nuevo día: ");
                     var x = sc.nextShort();
+
                     Record.checkDay(x);
                     day.set(x);
                 };
@@ -292,8 +343,12 @@ public class Main {
         });
 
         bi.updateRecord(cc.get(), capital.get(), interest.get(), day.get());
+        System.out.println("\nEl usuario ha sido actualizado con éxito.");
     }
 
+    /**
+     * Busca un registro de la lista.
+     */
     private static void searchUser() {
         AtomicReference<String> cc = new AtomicReference<>("");
         inputWrapper(() -> {
@@ -313,12 +368,12 @@ public class Main {
 
     private static void saveRecords() {
         System.out.print("Ingrese el nombre del archivo: ");
-        var fileName = sc.nextLine();
+        //var fileName = sc.nextLine();
     }
 
     private static void loadRecords() {
         System.out.print("Ingrese el nombre del archivo: ");
-        var fileName = sc.nextLine();
+        //var fileName = sc.nextLine();
     }
 
     /**

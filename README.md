@@ -51,8 +51,7 @@ INFORMACIÓN BANCARIA
 Seleccione una opción (1 - 10):
 
 ##  Salida
-La salida debe imprimir los datos correspondientes en consola.
+La salida debe imprimir los datos correspondientes en consola. ✅
 
 ## Adicional
-Modele el conjunto de clases que representa la solución lógica del requerimiento del
-usuario.
+Modele el conjunto de clases que representa la solución lógica del requerimiento del usuario.

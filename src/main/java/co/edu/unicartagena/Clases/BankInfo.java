@@ -2,20 +2,30 @@ package co.edu.unicartagena.Clases;
 
 import co.edu.unicartagena.Estructuras.SimpleLinkedList;
 
+import java.math.BigDecimal;
+
 /**
- * Lista enlazada simple para almacenar información de los usuarios.
+ * Lista enlazada simple para almacenar información de los registros de un banco.
+ * @author Pablo José Hernández Meléndez
  */
 public class BankInfo extends SimpleLinkedList<Record> {
-    private double totalCapital;
-    private double totalInterest;
+    /**
+     * Capital total registrado.
+     */
+    private BigDecimal totalCapital;
+
+    /**
+     * Interés total registrado.
+     */
+    private BigDecimal totalInterest;
 
     /**
      * Constructor de la clase.
      */
     public BankInfo() {
         super();
-        totalCapital = 0;
-        totalInterest = 0;
+        totalCapital = new BigDecimal(0);
+        totalInterest = new BigDecimal(0);
     }
 
     /**
@@ -23,7 +33,7 @@ public class BankInfo extends SimpleLinkedList<Record> {
      *
      * @return Capital total.
      */
-    public double getTotalCapital() {
+    public BigDecimal getTotalCapital() {
         return totalCapital;
     }
 
@@ -32,35 +42,36 @@ public class BankInfo extends SimpleLinkedList<Record> {
      *
      * @return Interés total.
      */
-    public double getTotalInterest() {
+    public BigDecimal getTotalInterest() {
         return totalInterest;
     }
 
     /**
      * Agrega un registro a la lista.
      *
-     * @param cc       Cédula del usuario.
-     * @param capital  Capital inicial del usuario.
-     * @param interest Interés del usuario.
-     * @param day      Día del usuario.
+     * @param cc          Cédula del usuario.
+     * @param capital     Capital inicial del registro.
+     * @param interestTax Tasa de interés del registro.
+     * @param day         Día del usuario.
      */
-    public void add(String cc, double capital, float interest, short day) {
-        add(new Record(cc, capital, interest, day));
-        totalCapital += capital;
-        totalInterest += interest * capital;
+    public void add(String cc, BigDecimal capital, BigDecimal interestTax, short day) {
+        Record newRecord = new Record(cc, capital, interestTax, day);
+        add(new Record(cc, capital, interestTax, day));
+        totalCapital = totalCapital.add(capital);
+        totalInterest = totalInterest.add(newRecord.getInterest());
     }
 
     /**
-     * Remueve el usuario de la lista.
+     * Remueve un registro de la lista.
      *
      * @param cc Cédula del usuario.
      */
     public void removeRecord(String cc) {
         var capital = getRecord(cc).getCapital();
         var interest = getRecord(cc).getInterest();
-        deleteFirst(new Record(cc, 0, 0, (short) 0));
-        totalCapital -= capital;
-        totalInterest -= interest * capital;
+        deleteFirst(getRecord(cc));
+        totalCapital = totalCapital.subtract(capital);
+        totalInterest = totalInterest.subtract(interest);
     }
 
     /**
@@ -82,6 +93,13 @@ public class BankInfo extends SimpleLinkedList<Record> {
         }
     }
 
+    /**
+     * Método recursivo para obtener un registro de la lista.
+     *
+     * @param node Nodo actual.
+     * @param cc   Cédula del usuario.
+     * @return Registro del usuario.
+     */
     private Record handleGet(Node<Record> node, String cc) {
         if (!node.getValue().getCc().equals(cc)) {
             return handleGet(node.getNext(), cc);
@@ -90,19 +108,27 @@ public class BankInfo extends SimpleLinkedList<Record> {
         return node.getValue();
     }
 
-    public void updateRecord(String cc, double capital, float interest, short day) {
+    /**
+     * Actualiza un registro de la lista.
+     *
+     * @param cc          Cédula del usuario.
+     * @param capital     Capital del usuario.
+     * @param interestTax Tasa de interés del usuario.
+     * @param day         Día en que el depósito fue realizado.
+     */
+    public void updateRecord(String cc, BigDecimal capital, BigDecimal interestTax, short day) {
         var toUpdate = getRecord(cc);
-        var capitalDiff = capital - toUpdate.getCapital();
-        var interestDiff = interest - toUpdate.getInterest();
+        var capitalDiff = capital.subtract(toUpdate.getCapital());
 
-        totalCapital += capitalDiff;
-        totalInterest += interestDiff * capital;
+        totalCapital = totalCapital.add(capitalDiff);
+        totalInterest = totalInterest.subtract(toUpdate.getInterest());
 
-        toUpdate.update(capital, interest, day);
+        toUpdate.update(capital, interestTax, day);
+        totalInterest = totalInterest.add(toUpdate.getInterest());
     }
 
     /**
-     * Devuelve la lista como String.
+     * Devuelve la lista como String, mostrando el total del capital e interés acumulado.
      *
      * @return Lista como String.
      */
@@ -115,8 +141,8 @@ public class BankInfo extends SimpleLinkedList<Record> {
                 %s
                 %s
                 """.formatted(
-                String.format("%.2f", totalCapital),
-                String.format("%.2f", totalInterest),
+                String.format("%.2f", totalCapital.round(Record.context)),
+                String.format("%.2f", totalInterest.round(Record.context)),
                 String.format(Record.getFormat(), "Cédula", "Capital", "Interés", "Día"),
                 super.toString());
     }
