@@ -5,11 +5,11 @@ package co.edu.unicartagena.Clases;
  */
 public class Record {
     private String cc;
-    private float capital;
+    private double capital;
     private float interest;
     private short day;
 
-    public Record(String cc, float capital, float interest, short day) {
+    public Record(String cc, double capital, float interest, short day) {
         checkCC(cc);
         checkCapital(capital);
         checkInterest(interest);
@@ -21,9 +21,9 @@ public class Record {
         this.day = day;
     }
 
-    private void checkCC(String cc) throws IllegalArgumentException {
-        if (cc.length()<10){
-            throw new IllegalArgumentException("La cédula debe tener 10 dígitos");
+    public static void checkCC(String cc) throws IllegalArgumentException {
+        if (cc.length() != 10) {
+            throw new IllegalArgumentException("La cédula debe tener 10 dígitos. Ingresaste %d de 10 dígitos.".formatted(cc.length()));
         }
 
         for (var c : cc.toCharArray()) {
@@ -33,20 +33,20 @@ public class Record {
         }
     }
 
-    protected void checkCapital(float capital) throws IllegalArgumentException {
-        if (capital<0){
+    public static void checkCapital(double capital) throws IllegalArgumentException {
+        if (capital < 0) {
             throw new IllegalArgumentException("El capital debe ser mayor o igual a 0");
         }
     }
 
-    protected void checkInterest(float interest) throws IllegalArgumentException{
-        if (interest<0){
+    public static void checkInterest(float interest) throws IllegalArgumentException {
+        if (interest < 0) {
             throw new IllegalArgumentException("El interés debe ser un número mayor o igual a 0");
         }
     }
 
-    protected void checkDay(short day) throws IllegalArgumentException {
-        if (day<0 || day>365){
+    public static void checkDay(short day) throws IllegalArgumentException {
+        if (day < 0 || day > 365) {
             throw new IllegalArgumentException("El día debe ser un número entre 0 y 365");
         }
     }
@@ -55,7 +55,7 @@ public class Record {
         return cc;
     }
 
-    public float getCapital() {
+    public double getCapital() {
         return capital;
     }
 
@@ -67,11 +67,7 @@ public class Record {
         return day;
     }
 
-    public void setCc(String cc) {
-        this.cc = cc;
-    }
-
-    public void setCapital(float capital) {
+    public void setCapital(double capital) {
         checkCapital(capital);
         this.capital = capital;
     }
@@ -86,15 +82,21 @@ public class Record {
         this.interest = interest;
     }
 
+    public void update(double capital, float interest, short day){
+        this.capital = capital;
+        this.interest = interest;
+        this.day = day;
+    }
+
     public boolean equals(Record record) {
         return this.cc.equals(record.getCc());
     }
 
-    public static String getFormat(){
-        return "%-10s  %-10s  %-13s  %-4s";
+    public static String getFormat() {
+        return "%-10s  %-13s  %-13s  %-4s";
     }
 
     public String toString() {
-        return String.format("%-10s  %-10s  %-13s  %-4d", cc, "$%.2f".formatted(capital), "%.4f%%".formatted(interest), day);
+        return String.format("%-10s  %-13s  %-13s  %-4d", cc, "$%.2f".formatted(capital), "%.4f%%".formatted(interest), day);
     }
 }

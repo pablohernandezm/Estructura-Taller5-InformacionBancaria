@@ -88,7 +88,7 @@ public class SimpleLinkedList<T> {
          *
          * @return Sucesor del nodo actual.
          */
-        private E getValue() {
+        public E getValue() {
             return this.value;
         }
 
@@ -117,6 +117,7 @@ public class SimpleLinkedList<T> {
      */
     public SimpleLinkedList() {
         this.size = 0;
+        head = null;
     }
 
     /**
@@ -408,7 +409,11 @@ public class SimpleLinkedList<T> {
      * @throws NullPointerException Si el valor que se desea obtener no existe en la lista.
      */
     public T getFirst(T value) throws NullPointerException {
-        return handleGetFirst(head, value);
+        try{
+            return handleGetFirst(head, value);
+        } catch (NullPointerException e){
+            throw new NullPointerException("El valor que desea obtener no existe en la lista.");
+        }
     }
 
     /**

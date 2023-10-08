@@ -20,6 +20,7 @@ public class BankInfo extends SimpleLinkedList<Record> {
 
     /**
      * Obtiene el capital total registrado.
+     *
      * @return Capital total.
      */
     public double getTotalCapital() {
@@ -28,6 +29,7 @@ public class BankInfo extends SimpleLinkedList<Record> {
 
     /**
      * Obtiene el interés total registrado.
+     *
      * @return Interés total.
      */
     public double getTotalInterest() {
@@ -36,45 +38,86 @@ public class BankInfo extends SimpleLinkedList<Record> {
 
     /**
      * Agrega un registro a la lista.
-     * @param cc Cédula del usuario.
-     * @param capital Capital inicial del usuario.
+     *
+     * @param cc       Cédula del usuario.
+     * @param capital  Capital inicial del usuario.
      * @param interest Interés del usuario.
-     * @param day Día del usuario.
+     * @param day      Día del usuario.
      */
-    public void add(String cc, float capital, float interest, short day) {
+    public void add(String cc, double capital, float interest, short day) {
         add(new Record(cc, capital, interest, day));
         totalCapital += capital;
-        totalInterest += interest;
+        totalInterest += interest * capital;
     }
 
     /**
      * Remueve el usuario de la lista.
+     *
      * @param cc Cédula del usuario.
      */
     public void removeRecord(String cc) {
+        var capital = getRecord(cc).getCapital();
+        var interest = getRecord(cc).getInterest();
         deleteFirst(new Record(cc, 0, 0, (short) 0));
+        totalCapital -= capital;
+        totalInterest -= interest * capital;
     }
 
     /**
      * Obtiene el registro de la lista.
+     *
      * @param cc Cédula del usuario.
      */
     public Record getRecord(String cc) {
-        return getFirst(new Record(cc, 0, 0, (short) 0));
+        try {
+            Record.checkCC(cc);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+
+        try {
+            return handleGet(this.head, cc);
+        } catch (NullPointerException e) {
+            return null;
+        }
+    }
+
+    private Record handleGet(Node<Record> node, String cc) {
+        if (!node.getValue().getCc().equals(cc)) {
+            return handleGet(node.getNext(), cc);
+        }
+
+        return node.getValue();
+    }
+
+    public void updateRecord(String cc, double capital, float interest, short day) {
+        var toUpdate = getRecord(cc);
+        var capitalDiff = capital - toUpdate.getCapital();
+        var interestDiff = interest - toUpdate.getInterest();
+
+        totalCapital += capitalDiff;
+        totalInterest += interestDiff * capital;
+
+        toUpdate.update(capital, interest, day);
     }
 
     /**
-     * Actualiza el registro de la lista.
-     * @param record Registro a actualizar.
+     * Devuelve la lista como String.
+     *
+     * @return Lista como String.
      */
-    public void updateRecord(Record record){
-        var toUpdate = getRecord(record.getCc());
-        var capitalDiff = record.getCapital() - toUpdate.getCapital();
-        var interestDiff = record.getInterest() - toUpdate.getInterest();
-        totalCapital += capitalDiff;
-        totalInterest += interestDiff;
-        toUpdate.setCapital(record.getCapital());
-        toUpdate.setInterest(record.getInterest());
-        toUpdate.setDay(record.getDay());
+    @Override
+    public String toString() {
+        return """
+                Capital total: $%s
+                Interés total: $%s
+                                
+                %s
+                %s
+                """.formatted(
+                String.format("%.2f", totalCapital),
+                String.format("%.2f", totalInterest),
+                String.format(Record.getFormat(), "Cédula", "Capital", "Interés", "Día"),
+                super.toString());
     }
 }

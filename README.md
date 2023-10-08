@@ -44,7 +44,7 @@ INFORMACIÓN BANCARIA
 5. Dar de baja a usuarios ✅
 6. Actualizar usuarios ✅
 7. Buscar usuarios (por ID) ✅
-8. Listar los usuarios
+8. Listar los usuarios ✅
 9. Salvar Lista a Archivo
 10. Salir
 
