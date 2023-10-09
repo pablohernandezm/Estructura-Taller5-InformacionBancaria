@@ -3,15 +3,22 @@ package co.edu.unicartagena;
 import co.edu.unicartagena.Clases.BankInfo;
 import co.edu.unicartagena.Clases.Record;
 
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.*;
+import java.io.File;
 import java.math.BigDecimal;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 
 /**
  * Sistema de administración bancaria con interfaz de clientes basado en listas simples enlazadas
  *
- * @author Pablo José Hernández Meléndez
+ * @author Pablo Jose Hernandez Melendez
  * @see co.edu.unicartagena.Estructuras.SimpleLinkedList
  * @see co.edu.unicartagena.Clases.BankInfo
  * @see co.edu.unicartagena.Clases.Record
@@ -65,7 +72,7 @@ public class Main {
                 case 7 -> execute(Main::searchUser, true);
                 case 8 -> execute(() -> System.out.println(bi), true);
                 case 9 -> execute(Main::saveRecords, true);
-                case 10 -> execute(Main::loadRecords, true);
+                case 10 -> execute(Main::loadRecords, false);
                 case 11 -> {
                     break menu;
                 }
@@ -366,14 +373,83 @@ public class Main {
         }
     }
 
+    /**
+     * Guarda los registros en un archivo.
+     *
+     * @see co.edu.unicartagena.Main#openFileChooser(String, Consumer)
+     */
     private static void saveRecords() {
-        System.out.print("Ingrese el nombre del archivo: ");
-        //var fileName = sc.nextLine();
+        var valid = openFileChooser("Guardar registros", file -> {
+            Path path = Paths.get(file.getAbsolutePath());
+            try {
+                bi.save(path);
+                System.out.println("El archivo se ha guardado con éxito.");
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        });
+
+        if (!valid) {
+            System.out.print("El archivo no se ha guardado.");
+        }
     }
 
+    /**
+     * Carga los registros desde un archivo.
+     *
+     * @see co.edu.unicartagena.Main#openFileChooser(String, Consumer)
+     */
     private static void loadRecords() {
-        System.out.print("Ingrese el nombre del archivo: ");
-        //var fileName = sc.nextLine();
+        var valid = openFileChooser("Cargar registros", file -> {
+            Path path = Paths.get(file.getAbsolutePath());
+            try {
+                bi.load(path);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        });
+
+        if (!valid) {
+            System.out.println("No se pudo cargar el archivo.");
+        }
+    }
+
+    /**
+     * Abre un JFileChooser para seleccionar un archivo.
+     *
+     * @param title  Título del JFileChooser
+     * @param action Acción a ejecutar con el archivo seleccionado.
+     */
+    private static boolean openFileChooser(String title, Consumer<File> action) {
+        boolean valid = true;
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception ignored) {
+        }
+
+        JDialog dialog = new JDialog((Frame) null, title);
+        dialog.setAlwaysOnTop(true);
+
+        JFileChooser fc = new JFileChooser();
+
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("Archivos de texto", "txt");
+        fc.setFileFilter(filter);
+
+        fc.setAcceptAllFileFilterUsed(false);
+        fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+
+        fc.setCurrentDirectory(new File(System.getProperty("user.dir")));
+
+        var option = fc.showSaveDialog(dialog);
+        if (option == JFileChooser.APPROVE_OPTION) {
+            var file = fc.getSelectedFile();
+            action.accept(file);
+        } else {
+            valid = false;
+        }
+
+        dialog.dispose();
+        return valid;
     }
 
     /**
@@ -385,7 +461,7 @@ public class Main {
             if (System.getProperty("os.name").contains("Windows")) {
                 new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
             } else {
-                // unix or linux
+                // unix o linux
                 System.out.print("\033[H\033[2J");
                 System.out.flush();
             }

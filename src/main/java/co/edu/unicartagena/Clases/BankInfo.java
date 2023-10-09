@@ -3,10 +3,14 @@ package co.edu.unicartagena.Clases;
 import co.edu.unicartagena.Estructuras.SimpleLinkedList;
 
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Lista enlazada simple para almacenar información de los registros de un banco.
- * @author Pablo José Hernández Meléndez
+ *
+ * @author Pablo Jose Hernandez Melendez
  */
 public class BankInfo extends SimpleLinkedList<Record> {
     /**
@@ -56,7 +60,7 @@ public class BankInfo extends SimpleLinkedList<Record> {
      */
     public void add(String cc, BigDecimal capital, BigDecimal interestTax, short day) {
         Record newRecord = new Record(cc, capital, interestTax, day);
-        add(new Record(cc, capital, interestTax, day));
+        add(newRecord);
         totalCapital = totalCapital.add(capital);
         totalInterest = totalInterest.add(newRecord.getInterest());
     }
@@ -78,6 +82,7 @@ public class BankInfo extends SimpleLinkedList<Record> {
      * Obtiene el registro de la lista.
      *
      * @param cc Cédula del usuario.
+     * @return Registro.
      */
     public Record getRecord(String cc) {
         try {
@@ -128,9 +133,9 @@ public class BankInfo extends SimpleLinkedList<Record> {
     }
 
     /**
+     * {@inheritDoc}
+     * <p>
      * Devuelve la lista como String, mostrando el total del capital e interés acumulado.
-     *
-     * @return Lista como String.
      */
     @Override
     public String toString() {
@@ -141,9 +146,82 @@ public class BankInfo extends SimpleLinkedList<Record> {
                 %s
                 %s
                 """.formatted(
-                String.format("%.2f", totalCapital.round(Record.context)),
-                String.format("%.2f", totalInterest.round(Record.context)),
+                String.format("%.2f", totalCapital),
+                String.format("%.2f", totalInterest),
                 String.format(Record.getFormat(), "Cédula", "Capital", "Interés", "Día"),
                 super.toString());
+    }
+
+    /**
+     * Devuelve una versión simplificada de la lista en un StringBuilder, con los datos de cada registro separados por punto y coma.
+     *
+     * @return Lista en un StringBuilder.
+     * @see java.lang.StringBuilder
+     */
+    public StringBuilder getListSimplified() {
+        StringBuilder sb = new StringBuilder();
+        for (var node = head; node != null; node = node.getNext()) {
+            sb.append(node.getValue().getSimplifiedString());
+            sb.append("\n");
+
+            if (!node.hasNext()) {
+                break;
+            }
+        }
+
+        return sb;
+    }
+
+    /**
+     * Guarda los registros en un archivo.
+     *
+     * @param path Ruta del archivo.
+     * @throws java.lang.Exception Cuando ocurre un error al guardar los registros en el archivo.
+     */
+    public void save(Path path) throws Exception {
+        try {
+            Files.writeString(path, getListSimplified());
+        } catch (Exception e) {
+            throw new Exception("Error al guardar los registros en el archivo.\nCausa: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Carga los registros de un archivo.
+     *
+     * @param path Ruta del archivo.
+     * @throws java.lang.Exception Cuando ocurre un error al cargar los registros del archivo.
+     */
+    public void load(Path path) throws Exception {
+        AtomicInteger counter = new AtomicInteger();
+        AtomicInteger ignored = new AtomicInteger();
+
+        try (var lines = Files.lines(path)) {
+            lines.forEach(line -> {
+                var data = line.split(";");
+
+                try {
+                    var capital = data[1].replace(",", ".");
+                    var interest = data[3].replace(",", ".");
+
+                    Record.checkCC(data[0]);
+                    Record.checkCapital(new BigDecimal(capital));
+                    Record.checkDay(Short.parseShort(data[2]));
+                    Record.checkInterest(new BigDecimal(interest));
+                } catch (IllegalArgumentException e) {
+                    ignored.getAndIncrement();
+                }
+
+                add(data[0], new BigDecimal(data[1]), new BigDecimal(data[3]), Short.parseShort(data[2]));
+                counter.getAndIncrement();
+            });
+
+            System.out.printf("Se cargaron %d registros.\n", counter.get());
+            if (ignored.get() > 0) {
+                System.out.printf("%d registros fueron ignorados porque no cumplían con el formato necesario.\n", ignored.get());
+            }
+        } catch (Exception e) {
+            throw new Exception("Error al cargar los registros del archivo.\nCausa: " + e.getClass().getName()+": "+e.getCause());
+        }
     }
 }

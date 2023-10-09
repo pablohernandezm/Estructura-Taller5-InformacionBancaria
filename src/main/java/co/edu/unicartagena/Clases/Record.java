@@ -1,11 +1,12 @@
 package co.edu.unicartagena.Clases;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.math.RoundingMode;
 
 /**
  * Clase que representa un registro información bancaria para un usuario.
+ *
+ * @author Pablo Jose Hernandez Melendez
  */
 public class Record {
     /**
@@ -17,11 +18,6 @@ public class Record {
      * Capital inicial del usuario.
      */
     private BigDecimal capital;
-
-    /**
-     * MathContext utilizado para redondear los valores.
-     */
-    public static MathContext context = new MathContext(2, RoundingMode.HALF_UP);
 
     /**
      * Interés del usuario.
@@ -48,7 +44,7 @@ public class Record {
         checkDay(day);
 
         this.cc = cc;
-        this.capital = capital.round(context);
+        this.capital = capital.setScale(2, RoundingMode.DOWN);
         this.interestTax = interestTax;
         this.day = day;
     }
@@ -57,7 +53,7 @@ public class Record {
      * Verifica que la cédula ingresada sea válida.
      *
      * @param cc cédula del usuario.
-     * @throws IllegalArgumentException Si la cédula no tiene 10 dígitos o si no son números.
+     * @throws java.lang.IllegalArgumentException Si la cédula no tiene 10 dígitos o si no son números.
      */
     public static void checkCC(String cc) throws IllegalArgumentException {
         if (cc.length() != 10) {
@@ -75,7 +71,7 @@ public class Record {
      * Verifica que el capital ingresado sea válido.
      *
      * @param capital capital inicial del usuario.
-     * @throws IllegalArgumentException Si el capital ingresado es menor a 0.
+     * @throws java.lang.IllegalArgumentException Si el capital ingresado es menor a 0.
      */
     public static void checkCapital(BigDecimal capital) throws IllegalArgumentException {
         if (capital.compareTo(new BigDecimal(0)) < 0) {
@@ -87,7 +83,7 @@ public class Record {
      * Verifica que el interés ingresado sea válido.
      *
      * @param interest interés del usuario.
-     * @throws IllegalArgumentException Si el interés ingresado es menor a 0.
+     * @throws java.lang.IllegalArgumentException Si el interés ingresado es menor a 0.
      */
     public static void checkInterest(BigDecimal interest) throws IllegalArgumentException {
         if (interest.compareTo(new BigDecimal(0)) < 0) {
@@ -99,7 +95,7 @@ public class Record {
      * Verifica que el día ingresado sea válido.
      *
      * @param day día en que se depositó el capital.
-     * @throws IllegalArgumentException Si el día ingresado es menor a 0 o mayor a 360.
+     * @throws java.lang.IllegalArgumentException Si el día ingresado es menor a 0 o mayor a 360.
      */
     public static void checkDay(short day) throws IllegalArgumentException {
         if (day < 0 || day > 360) {
@@ -140,7 +136,7 @@ public class Record {
      * @return Interés del usuario.
      */
     public BigDecimal getInterest() {
-        return capital.multiply(interestTax).add(BigDecimal.ONE.subtract(BigDecimal.valueOf(day).divide(BigDecimal.valueOf(360), 4, RoundingMode.HALF_UP))).round(context);
+        return capital.multiply(interestTax).add(BigDecimal.valueOf(360).subtract(BigDecimal.valueOf(day)).divide(BigDecimal.valueOf(360), 10, RoundingMode.HALF_UP)).setScale(2, RoundingMode.UP);
     }
 
     /**
@@ -160,7 +156,7 @@ public class Record {
      * @param day      Día en que se depositó el capital.
      */
     public void update(BigDecimal capital, BigDecimal interest, short day) {
-        this.capital = capital.round(context);
+        this.capital = capital.setScale(2, RoundingMode.DOWN);
         this.interestTax = interest;
         this.day = day;
     }
@@ -182,6 +178,15 @@ public class Record {
      * @see #getFormat() Formato utilizado para imprimir los registros.
      */
     public String toString() {
-        return String.format("%-10s  %-13s  %-13s  %-4d", cc, "$%.2f".formatted(capital.round(context)), "%.4f%%".formatted(interestTax.multiply(BigDecimal.valueOf(100), context)), day);
+        return String.format("%-10s  %-13s  %-13s  %-4d", cc, "$%.2f".formatted(capital), "%.4f%%".formatted(interestTax.multiply(BigDecimal.valueOf(100))), day);
+    }
+
+    /**
+     * Obtiene los datos del registro separados por punto y coma.
+     *
+     * @return String con los datos del registro.
+     */
+    public String getSimplifiedString() {
+        return String.format("%s;%s;%d;%s", cc, capital.toPlainString(), day, interestTax.toPlainString());
     }
 }

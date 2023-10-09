@@ -5,6 +5,7 @@ package co.edu.unicartagena.Estructuras;
  *
  * @param <T> Tipo de dato que almacenará la lista.
  * @author Pablo José Hernández Meléndez
+ * @version $Id: $Id
  */
 public class SimpleLinkedList<T> {
     /**
@@ -138,7 +139,7 @@ public class SimpleLinkedList<T> {
      * Método para convertir la lista en un String.
      *
      * @return Lista en formato String.
-     * @throws NullPointerException Si la lista no tiene nodos.
+     * @throws java.lang.NullPointerException Si la lista no tiene nodos.
      */
     public String toString() throws NullPointerException {
         if (this.size == 0) {
@@ -175,7 +176,7 @@ public class SimpleLinkedList<T> {
      * Método para eliminar la primera ocurrencia de un valor en la lista.
      *
      * @param value Valor que se desea eliminar.
-     * @throws NullPointerException Si el valor que se desea eliminar no existe en la lista.
+     * @throws java.lang.NullPointerException Si el valor que se desea eliminar no existe en la lista.
      */
     public void deleteFirst(T value) throws NullPointerException {
         handleDeleteFirst(head, value);
