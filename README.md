@@ -3,6 +3,17 @@ El Banco que lo contrato la semana pasada ha decidido mejorar sus procesos para 
 tiene en mente un sistema de administración con interfaz de clientes basado en **listas
 simples enlazadas**.
 
+## Equipo de trabajo
+- [Pablo José Hernández meléndez](https://github.com/pablohernandezm)
+- [Jhoy Luis Castro Casanova](https://www.linkedin.com/in/jhoy-luis-castro-casanova-061142249/)
+
+## Entorno de desarrollo
+El proyecto fue realizado utilizando en conjunto las herramientas:
+- Apache Netbeans IDE 19.0.0
+- IntelliJ IDEA 2023.2.2 (Ultimate Edition)
+- 
+Además de la versión 21 de Java (openjdk version "21" 2023-09-19 LTS).
+
 ## Requerimientos
 - Calcular el número de clientes.
 - Total de capital depositado.
