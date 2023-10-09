@@ -11,6 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Lista enlazada simple para almacenar información de los registros de un banco.
  *
  * @author Pablo Jose Hernandez Melendez
+ * @author Jhoy Luis Castro Casanova
  */
 public class BankInfo extends SimpleLinkedList<Record> {
     /**

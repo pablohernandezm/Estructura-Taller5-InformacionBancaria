@@ -7,6 +7,7 @@ import java.math.RoundingMode;
  * Clase que representa un registro información bancaria para un usuario.
  *
  * @author Pablo Jose Hernandez Melendez
+ * @author Jhoy Luis Castro Casanova
  */
 public class Record {
     /**

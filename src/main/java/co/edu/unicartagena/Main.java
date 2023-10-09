@@ -19,6 +19,7 @@ import java.util.function.Consumer;
  * Sistema de administración bancaria con interfaz de clientes basado en listas simples enlazadas
  *
  * @author Pablo Jose Hernandez Melendez
+ * @author Jhoy Luis Castro Casanova
  * @see co.edu.unicartagena.Estructuras.SimpleLinkedList
  * @see co.edu.unicartagena.Clases.BankInfo
  * @see co.edu.unicartagena.Clases.Record
