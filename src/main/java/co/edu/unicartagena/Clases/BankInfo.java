@@ -221,7 +221,7 @@ public class BankInfo extends SimpleLinkedList<Record> {
                 System.out.printf("%d registros fueron ignorados porque no cumplían con el formato necesario.\n", ignored.get());
             }
         } catch (Exception e) {
-            throw new Exception("Error al cargar los registros del archivo.\nCausa: " + e.getClass().getName()+": "+e.getCause());
+            throw new Exception("Error al cargar los registros del archivo.\nCausa: " + e.getClass().getName() + ": " + e.getCause());
         }
     }
 }
